@@ -13,7 +13,6 @@ namespace Blueprinter
     public static class GameAssemblies
     {
         public const string GeneratedPackagePath = "Packages/nuclearoption";
-        private const string LegacyGeneratedPackagePath = "Packages/NuclearOption";
         private const string GameName = "NuclearOption";
         private const string GameVersionFileName = "game-version.txt";
 
@@ -60,7 +59,6 @@ namespace Blueprinter
         public static void Import(string managedFolder, string gameVersion)
         {
             var targetPackagePath = BlueprinterAssets.ToAbsolutePath(GeneratedPackagePath);
-            var legacyPackagePath = BlueprinterAssets.ToAbsolutePath(LegacyGeneratedPackagePath);
             var providedAssemblies = GetProvidedAssemblyNames();
 
             AssetDatabase.DisallowAutoRefresh();
@@ -68,8 +66,6 @@ namespace Blueprinter
             {
                 if (Directory.Exists(targetPackagePath))
                     Directory.Delete(targetPackagePath, true);
-                if (!string.Equals(legacyPackagePath, targetPackagePath, StringComparison.Ordinal) && Directory.Exists(legacyPackagePath))
-                    Directory.Delete(legacyPackagePath, true);
                 Directory.CreateDirectory(targetPackagePath);
 
                 foreach (var fileName in ScriptAssemblies)
@@ -147,8 +143,7 @@ namespace Blueprinter
             var absolutePath = (Path.IsPathRooted(path) ? Path.GetFullPath(path) : BlueprinterAssets.ToAbsolutePath(path)).Replace('\\', '/');
             var comparison = Application.platform == RuntimePlatform.WindowsEditor ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
             var generatedTarget = BlueprinterAssets.ToAbsolutePath(GeneratedPackagePath).Replace('\\', '/').TrimEnd('/') + "/";
-            var legacyTarget = BlueprinterAssets.ToAbsolutePath(LegacyGeneratedPackagePath).Replace('\\', '/').TrimEnd('/') + "/";
-            return absolutePath.StartsWith(generatedTarget, comparison) || absolutePath.StartsWith(legacyTarget, comparison);
+            return absolutePath.StartsWith(generatedTarget, comparison);
         }
 
         private static void CopyAssembly(string sourcePath, string destinationFolder)
