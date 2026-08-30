@@ -104,3 +104,12 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# Blueprinter generated/local content
+
+/BlueprinterCache/
+/Assets/Blueprinter/_donotship/
+/Assets/Blueprinter/_donotship.meta
+/Assets/Blueprinter/Generated/
+/Assets/Blueprinter/Generated.meta
+/Packages/nuclearoption/
