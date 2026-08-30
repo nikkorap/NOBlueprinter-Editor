@@ -1,0 +1,7 @@
+{
+  "name": "com.nikkorap.blueprinter",
+  "version": "0.1.0",
+  "displayName": "Blueprinter",
+  "description": "Editor tools for making Blueprinter mods",
+  "unity": "2022.3"
+}
