@@ -15,4 +15,5 @@ Blueprinter bepinex Mod (https://github.com/nikkorap/NOBlueprinter-Releases)
 - Basic Unity Editor knowledge
 
 ## Getting Started
-Follow the Blueprinter Editor Guide (GUIDE.md) to open and set up the project.
+Download the repository as a zip, then follow the [Blueprinter Editor Guide](GUIDE.md) to open and set up the project.
+<img width="1413" height="1009" alt="image" src="https://github.com/user-attachments/assets/45de9872-f248-4160-9020-d8c7068b2573" />
