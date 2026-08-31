@@ -17,6 +17,6 @@ Blueprinter bepinex Mod (https://github.com/nikkorap/NOBlueprinter)
 ## Getting Started
 Download the repository as a zip, then follow the [Blueprinter Editor Guide](GUIDE.md) to open and set up the project. 
 
-For a more visual guide you can refer to this guide made by Draken: [Draken’s Blueprinter Guide](https://docs.google.com/presentation/d/1DRlvonA4_T1rgQ8DB_7Mmis6tjg7ARDbe6uS63d4hSA/edit?usp=sharing)
+For a more visual guide you can refer to [Draken’s Blueprinter Guide](https://docs.google.com/presentation/d/1DRlvonA4_T1rgQ8DB_7Mmis6tjg7ARDbe6uS63d4hSA/edit?usp=sharing)
 
 <img width="1413" height="1009" alt="image" src="https://github.com/user-attachments/assets/45de9872-f248-4160-9020-d8c7068b2573" />
