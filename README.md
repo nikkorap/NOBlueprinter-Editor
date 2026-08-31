@@ -5,7 +5,7 @@ Blueprinter lets you use game assets, components, and ScriptableObject types in 
 
 Nuclear Option does not provide official mod support.
 
-Blueprinter bepinex Mod (https://github.com/nikkorap/NOBlueprinter)
+Blueprinter bepinex Mod (https://github.com/nikkorap/NOBlueprinter-Releases)
 
 ## Requirements
 - Nuclear Option (https://store.steampowered.com/app/2168680/Nuclear_Option/)
