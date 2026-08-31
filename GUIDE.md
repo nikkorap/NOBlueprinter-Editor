@@ -31,7 +31,6 @@ AssetRipper file windows can open behind its browser window. Check the taskbar i
 2. Open Unity Hub.
 3. Click `Add` > `Add project from disk`.
 4. Select the extracted Blueprinter project folder and open it.
-
 5. On the top bar select `Blueprinter` > `Project Setup`.
 6. Enter the installed game version under `1. Enter game version`.
 7. Click `2. Import Game Assemblies`
@@ -43,6 +42,7 @@ AssetRipper file windows can open behind its browser window. Check the taskbar i
 13. Click `5. Build _donotship`.
 Building `_donotship` prepares the imported game assets for mod builds, that will take a while.
 `_donotship` contains the imported placeholder assets and is locked by default. This folder is read only.
+If the mod uses custom script DLLs, place them under `Assets/Plugins`.
 
 ## 4. Example Mod
 A source ZIP contains editable Blueprinter mod source. Blueprinter includes `Assets/Blueprinter/Example/myfirstmod.source.zip` as an example.
