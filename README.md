@@ -1,5 +1,5 @@
 # Blueprinter Editor (WIP still testing)
-An unofficial Unity project for creating Nuclear Option mods.
+An unofficial Unity package for creating Nuclear Option mods.
 
 Blueprinter lets you use game assets, components, and ScriptableObject types in blueprinter mods without redistributing the original game files.
 
@@ -15,7 +15,7 @@ Blueprinter bepinex Mod (https://github.com/nikkorap/NOBlueprinter)
 - Basic Unity Editor knowledge
 
 ## Getting Started
-Download the repository as a zip, then follow the [Blueprinter Editor Guide](GUIDE.md) to open and set up the project. 
+Download the latest Blueprinter Unity Project ZIP from the Releases page, then follow the [Blueprinter Editor Guide](GUIDE.md) to open and set up the project. 
 
 For a more visual guide you can refer to [Draken’s Blueprinter Guide](https://docs.google.com/presentation/d/1DRlvonA4_T1rgQ8DB_7Mmis6tjg7ARDbe6uS63d4hSA/edit?usp=sharing)
 

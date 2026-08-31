@@ -27,7 +27,7 @@ AssetRipper file windows can open behind its browser window. Check the taskbar i
 13. Close AssetRipper.
 
 ## 3. Unity Project Setup
-1. Download the repository and extract it somewhere.
+1. Download the latest Blueprinter Unity Project ZIP from the Releases page and extract it somewhere.
 2. Open Unity Hub.
 3. Click `Add` > `Add project from disk`.
 4. Select the extracted Blueprinter project folder and open it.
