@@ -19,10 +19,10 @@ AssetRipper file windows can open behind its browser window. Check the taskbar i
 5. Save the settings.
 6. Select `File` > `Open File`.
 7. Navigate to the game install folder and select `NuclearOption.exe`.
-8. Select `Export` > `Export Unity Project`.
+8. Select `Export` > `Export all files`.
 9. Select an output folder.
 10. Enable `Create Subfolder`.
-11. Start the export.
+11. Click `Export Unity Project`.
 12. Wait until the AssetRipper console shows `Export : Finished post-export`.
 13. Close AssetRipper.
 
