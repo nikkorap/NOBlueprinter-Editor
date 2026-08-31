@@ -151,12 +151,38 @@ namespace Blueprinter
                    BlueprinterAssets.IsPathUnder(fullPath, BlueprinterAssets.ToAbsolutePath(GameAssetRootFolder));
         }
 
-        private void ExportSource(string modName)
+        // right click context menu
+        [MenuItem("Assets/Blueprinter/Export Source Zip", false, 0)]
+        private static void ExportSelectedSourceZip()
         {
-            var directory = !string.IsNullOrEmpty(_outputFolder) && Directory.Exists(_outputFolder) ? _outputFolder : Path.GetDirectoryName(Application.dataPath);
+            if (!ValidateExportSelectedSourceZip())
+                return;
 
-            var baseName = BlueprinterAssets.SanitizeFileName(string.IsNullOrWhiteSpace(_displayName) ? modName : _displayName);
-            var version = BlueprinterAssets.SanitizeFileName(_version);
+            var path = AssetDatabase.GetAssetPath(Selection.activeObject).Replace('\\', '/');
+            ExportSource(Path.GetFileName(path));
+        }
+
+        // enabled vs greyed out
+        [MenuItem("Assets/Blueprinter/Export Source Zip", true)]
+        private static bool ValidateExportSelectedSourceZip()
+        {
+            var path = AssetDatabase.GetAssetPath(Selection.activeObject).Replace('\\', '/');
+            if (!AssetDatabase.IsValidFolder(path))
+                return false;
+
+            var parent = Path.GetDirectoryName(path)?.Replace('\\', '/');
+            return string.Equals(parent, ModRootFolder, StringComparison.Ordinal);
+        }
+
+        private static void ExportSource(string modName)
+        {
+            var info = ModInfo.Load(modName);
+            var outputFolder = EditorPrefs.GetString(BuildOutputPrefsKey, string.Empty);
+
+            var directory = !string.IsNullOrEmpty(outputFolder) && Directory.Exists(outputFolder) ? outputFolder : Path.GetDirectoryName(Application.dataPath);
+
+            var baseName = BlueprinterAssets.SanitizeFileName(string.IsNullOrWhiteSpace(info.displayName) ? modName : info.displayName);
+            var version = BlueprinterAssets.SanitizeFileName(info.version);
             var defaultName = string.IsNullOrEmpty(version) ? baseName + SourceArchive.SourceZipSuffix : baseName + "_" + version + SourceArchive.SourceZipSuffix;
 
             var outputPath = EditorUtility.SaveFilePanel("Export Source ZIP", directory, defaultName, "zip");
@@ -176,7 +202,7 @@ namespace Blueprinter
                 outputPath = stem + SourceArchive.SourceZipSuffix;
             }
 
-            SourceExporter.ExportMod(modName, _displayName, _version, outputPath);
+            SourceExporter.ExportMod(modName, info.displayName, info.version, outputPath);
         }
     }
 }

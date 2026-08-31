@@ -35,6 +35,7 @@ namespace Blueprinter
             public long FileId;
         }
 
+        // top bar
         [MenuItem("Blueprinter/Import Source ZIP", false, 40)]
         private static void ImportSourceZip()
         {
@@ -42,6 +43,30 @@ namespace Blueprinter
             if (string.IsNullOrEmpty(path))
                 return;
 
+            ImportSourceZip(path);
+        }
+
+        // right click context menu
+        [MenuItem("Assets/Blueprinter/Import Source Zip", false, 0)]
+        private static void ImportSelectedSourceZip()
+        {
+            if (!ValidateImportSelectedSourceZip())
+                return;
+
+            var path = AssetDatabase.GetAssetPath(Selection.activeObject);
+            ImportSourceZip(BlueprinterAssets.ToAbsolutePath(path));
+        }
+
+        // enabled vs greyed out
+        [MenuItem("Assets/Blueprinter/Import Source Zip", true)]
+        private static bool ValidateImportSelectedSourceZip()
+        {
+            var path = AssetDatabase.GetAssetPath(Selection.activeObject);
+            return path.EndsWith(SourceArchive.SourceZipSuffix, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static void ImportSourceZip(string path)
+        {
             var session = CreateSession(path);
             if (session == null)
                 return;
