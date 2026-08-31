@@ -1,4 +1,4 @@
-# Blueprinter Editor
+# Blueprinter Editor (WIP still testing)
 An unofficial Unity project for creating Nuclear Option mods.
 
 Blueprinter lets you use game assets, components, and ScriptableObject types in blueprinter mods without redistributing the original game files.
