@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace Blueprinter
 {
+    // [CreateAssetMenu(menuName = "Blueprinter/OpAddWeaponMountToWeaponManager", fileName = "OpAddWeaponMountToWeaponManager")]
     public class OpAddWeaponMountToWeaponManager : OpCore
     {
         [Tooltip("WeaponMount asset from this mod.")]
@@ -84,6 +86,16 @@ namespace Blueprinter
             }
 
             return result.ToArray();
+        }
+
+        [CustomEditor(typeof(OpAddWeaponMountToWeaponManager))]
+        internal sealed class OpAddWeaponMountToWeaponManagerEditor : UnityEditor.Editor
+        {
+            public override void OnInspectorGUI()
+            {
+                EditorGUILayout.HelpBox("This is a deprecated op, you should probably replace this with OpAddWeaponToHardpoint", MessageType.Warning);
+                DrawDefaultInspector();
+            }
         }
     }
 }

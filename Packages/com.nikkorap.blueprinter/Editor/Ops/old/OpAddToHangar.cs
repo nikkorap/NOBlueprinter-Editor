@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace Blueprinter
@@ -25,6 +26,7 @@ namespace Blueprinter
         [InspectorName("hangar (Dynamo)")] Destroyer1__Hull_hangarFloor
     }
 
+    // [CreateAssetMenu(menuName = "Blueprinter/OpAddToHangar", fileName = "OpAddToHangar")]
     public class OpAddToHangar : OpCore
     {
         [Tooltip("AircraftDefinition asset from this mod.")]
@@ -51,6 +53,16 @@ namespace Blueprinter
                 BundleAsset = assetRef,
                 Hangars = (Hangars ?? Array.Empty<HangarId>()).Select(h => h.ToString()).ToArray()
             };
+        }
+
+        [CustomEditor(typeof(OpAddToHangar))]
+        internal sealed class OpAddToHangarEditor : UnityEditor.Editor
+        {
+            public override void OnInspectorGUI()
+            {
+                EditorGUILayout.HelpBox("This is a deprecated op, you should probably replace this with OpAddAircraftToHangars", MessageType.Warning);
+                DrawDefaultInspector();
+            }
         }
     }
 }

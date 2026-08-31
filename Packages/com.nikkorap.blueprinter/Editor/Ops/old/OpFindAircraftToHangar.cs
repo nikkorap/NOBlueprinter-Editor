@@ -1,8 +1,10 @@
 using System;
+using UnityEditor;
 using UnityEngine;
 
 namespace Blueprinter.Editor.Ops
 {
+    // [CreateAssetMenu(menuName = "Blueprinter/OpFindAircraftToHangar", fileName = "OpFindAircraftToHangar")]
     public class OpFindAircraftToHangar : OpCore
     {
         public GameObject TargetUnitPrefab;
@@ -34,6 +36,16 @@ namespace Blueprinter.Editor.Ops
                 HangarKey = $"{TargetUnitPrefab.name}__{TargetHangarObjectName}",
                 AircraftNames = AircraftDefinitions ?? Array.Empty<string>()
             };
+        }
+
+        [CustomEditor(typeof(OpFindAircraftToHangar))]
+        public class OpFindAircraftToHangarEditor : UnityEditor.Editor
+        {
+            public override void OnInspectorGUI()
+            {
+                EditorGUILayout.HelpBox("This is a deprecated op, you should probably replace this with OpAddAircraftToHangars", MessageType.Warning);
+                DrawDefaultInspector();
+            }
         }
     }
 }
