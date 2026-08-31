@@ -36,7 +36,6 @@ namespace Blueprinter
             "lightingsettings",
             "streamingassets",
             "missions",
-            "computeshader",
             "cubemap",
             "resources",
             "textasset"
@@ -129,6 +128,12 @@ namespace Blueprinter
 
                 if (BlueprinterAssets.IsCodeOrAssemblyFile(sourcePath) || IsInSkippedFolder(relativePath))
                     continue;
+
+                if (!File.Exists(sourcePath + ".meta"))
+                {
+                    Debug.LogWarning($"[Blueprinter] Skipping AssetRipper file without meta '{relativePath}'");
+                    continue;
+                }
 
                 if (!TryReadExportGuid(sourcePath, relativePath, out var exportGuid))
                     return false;
