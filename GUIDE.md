@@ -6,6 +6,7 @@ The full setup process can take 1–3 hours depending on hardware.
 - Nuclear Option (https://store.steampowered.com/app/2168680/Nuclear_Option/)
 - Unity Hub (https://unity.com/download) and a Unity account
 - Unity Editor 2022.3.62f2
+- git (https://git-scm.com)
 - AssetRipper (https://github.com/AssetRipper/AssetRipper)
 - Basic Unity Editor knowledge
 
