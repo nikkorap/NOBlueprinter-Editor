@@ -39,8 +39,9 @@ AssetRipper file windows can open behind its browser window. Check the taskbar i
 9. Click `3. Import Game Assets` 
 10. Navigate to the Assetripper output folder and select the `ExportedProject/Assets` folder.
 11. If prompted, click `Import TMP Essentials`.
-12. Click `4. Refresh Op References`.
-13. Click `5. Build _donotship`.
+12. **DO NOT IMPORT `TMP Examples & Extras`.**
+13. Click `4. Refresh Op References`.
+14. Click `5. Build _donotship`.
 Building `_donotship` prepares the imported game assets for mod builds, that will take a while.
 `_donotship` contains the imported placeholder assets and is locked by default. This folder is read only.
 If the mod uses custom script DLLs, place them under `Assets/Plugins`.
@@ -100,3 +101,8 @@ Blueprinter imports the mod under `Assets/Blueprinter/Mods`.
 1. Open a prefab in Prefab Mode.
 2. Select `Blueprinter` > `Tools` > `Validate references`.
 Blueprinter checks the prefab for missing references and reports them in the Console.
+
+## 10. FAQ (wip)
+
+I cant see the blueprinter tab on the top bar
+- Check the console, if it says `Library\ScriptAssemblies\Assembly-CSharp.dll: The target path already exists and is read-only` then make sure you don't have any `*.cs` files in `Assets\`, most commonly caused by importing `TMP Examples & Extras`. If you did import that then delete `assets/TextMesh Pro/Examples & Extras` folder
