@@ -103,6 +103,5 @@ Blueprinter imports the mod under `Assets/Blueprinter/Mods`.
 Blueprinter checks the prefab for missing references and reports them in the Console.
 
 ## 10. FAQ (wip)
-
-I cant see the blueprinter tab on the top bar
-- Check the console, if it says `Library\ScriptAssemblies\Assembly-CSharp.dll: The target path already exists and is read-only` then make sure you don't have any `*.cs` files in `Assets\`, most commonly caused by importing `TMP Examples & Extras`. If you did import that then delete `assets/TextMesh Pro/Examples & Extras` folder
+Q: I have a persistent error `Library\ScriptAssemblies\Assembly-CSharp.dll: The target path already exists and is read-only`
+A: Make sure you don't have any `*.cs` files in `Assets\`, most commonly caused by importing `TMP Examples & Extras`. If you did import that then delete `assets/TextMesh Pro/Examples & Extras` folder
