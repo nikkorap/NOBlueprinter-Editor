@@ -449,6 +449,46 @@ namespace Blueprinter
             return result;
         }
 
+		private static string ToRuntimeObjectReferencePath(SerializedProperty property, string componentType)
+		{
+			if (property.serializedObject.targetObject is Material && TryGetMaterialTexturePropertyName(property, out var texturePropertyName))
+				return "materialTexture::" + texturePropertyName;
+		
+			return ToRuntimeMemberPath(property.propertyPath, componentType);
+		}
+		
+		private static bool TryGetMaterialTexturePropertyName(SerializedProperty property, out string propertyName)
+		{
+			propertyName = null;
+		
+			const string prefix = "m_SavedProperties.m_TexEnvs.Array.data[";
+			const string suffix = "].second.m_Texture";
+		
+			var path = property.propertyPath;
+		
+			if (!path.StartsWith(prefix, StringComparison.Ordinal) || !path.EndsWith(suffix, StringComparison.Ordinal))
+				return false;
+		
+			var indexStart = prefix.Length;
+			var indexEnd = path.IndexOf(']', indexStart);
+		
+			if (indexEnd < 0 || !int.TryParse(path.Substring(indexStart, indexEnd - indexStart), out var index))
+				return false;
+		
+			var texEnvs = property.serializedObject.FindProperty("m_SavedProperties.m_TexEnvs");
+		
+			if (texEnvs == null || !texEnvs.isArray || index < 0 || index >= texEnvs.arraySize)
+				return false;
+		
+			var entry = texEnvs.GetArrayElementAtIndex(index);
+			var key = entry.FindPropertyRelative("first");
+		
+			if (key == null || key.propertyType != SerializedPropertyType.String || string.IsNullOrEmpty(key.stringValue))
+				return false;
+		
+			propertyName = key.stringValue;
+			return true;
+		}
         private static void ScanReferences(SerializedObject serializedObject, string locationId, AssetRef modAssetRef, string hierarchyPath, string componentType, int componentIndex, ManifestBuildContext context)
         {
             var property = serializedObject.GetIterator();
@@ -485,7 +525,7 @@ namespace Blueprinter
                 if (referencedObject == null || !TryGetGameAssetInfo(referencedObject, context, out var gameAssetInfo))
                     continue;
 
-                var memberPath = ToRuntimeMemberPath(property.propertyPath, componentType);
+                var memberPath = ToRuntimeObjectReferencePath(property, componentType);
                 if (referencedObject is UnityEngine.Audio.AudioMixerGroup && string.Equals(gameAssetInfo.Location.asset.type, BlueprinterAssets.GetRuntimeTypeName(typeof(UnityEngine.Audio.AudioMixer)), StringComparison.Ordinal))
                 {
                     memberPath += "::" + referencedObject.name;
