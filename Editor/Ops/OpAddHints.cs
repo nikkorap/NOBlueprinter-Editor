@@ -6,13 +6,21 @@ namespace Blueprinter.Editor.Ops
     [CreateAssetMenu(menuName = "Blueprinter/OpAddHints", fileName = "OpAddHints")]
     public class OpAddHints : OpCore
     {
-        [TextArea]
-        public string[] hints = Array.Empty<string>();
+        public HintEntry[] hints = Array.Empty<HintEntry>();
+
+        [Serializable]
+        public class HintEntry
+        {
+            public string type = "Did you know?";
+
+            [TextArea]
+            public string text;
+        }
 
         [Serializable]
         private class PayloadDto
         {
-            public string[] hints;
+            public HintEntry[] hints;
         }
 
         public override string opId => "OpAddHints";
@@ -22,7 +30,7 @@ namespace Blueprinter.Editor.Ops
         {
             foreach (var hint in hints)
             {
-                if (!RequireValue(hint, nameof(hints)))
+                if (hint == null || !RequireValue(hint.text, nameof(hints)))
                     return null;
             }
 
