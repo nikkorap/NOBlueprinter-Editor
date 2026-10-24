@@ -27,6 +27,7 @@ namespace Blueprinter
         private class GameAssetInfo
         {
             public LocationRef Location;
+            public string SourceBundle;
             public long LocalFileId;
             public AssetPatch Patch;
         }
@@ -67,8 +68,9 @@ namespace Blueprinter
             Directory.CreateDirectory(cacheFolder);
 
             var gameAssetPaths = BlueprinterAssets.GetGameAssetPaths();
+            var customAssetPaths = BlueprinterAssets.GetCustomAssetPaths();
             var bundleName = modName.ToLowerInvariant();
-            if (BuildAssetBundles(cacheFolder, bundleName, buildAssetPaths, gameAssetPaths))
+            if (BuildAssetBundles(cacheFolder, bundleName, buildAssetPaths, gameAssetPaths, customAssetPaths))
                 CopyBuiltMod(cacheFolder, bundleName, displayName, version, outputFolder);
         }
 
@@ -153,9 +155,60 @@ namespace Blueprinter
             return gameAssetInfo;
         }
 
+        private static GameAssetInfo GetOrCreateCustomAssetInfo(string path, ManifestBuildContext context)
+        {
+            if (!BlueprinterAssets.TryGetCustomAssetTarget(path, out var bundleName, out var locator))
+                return null;
+
+            if (context.GameAssets.TryGetValue(path, out var customAssetInfo))
+                return customAssetInfo;
+
+            var mainAsset = AssetDatabase.LoadMainAssetAtPath(path);
+            if (mainAsset == null)
+                return null;
+
+            if (!AssetDatabase.TryGetGUIDAndLocalFileIdentifier(mainAsset, out _, out long localFileId))
+            {
+                Debug.LogError($"[Blueprinter] Missing custom asset identity '{path}'");
+                context.HasErrors = true;
+                return null;
+            }
+
+            var type = BlueprinterAssets.GetRuntimeTypeName(mainAsset.GetType());
+            customAssetInfo = new GameAssetInfo
+            {
+                LocalFileId = localFileId,
+                SourceBundle = bundleName,
+                Location = new LocationRef
+                {
+                    id = $"{bundleName}:{locator}|{type}",
+                    asset = new AssetRef
+                    {
+                        locator = locator,
+                        name = mainAsset.name,
+                        type = type
+                    }
+                }
+            };
+
+            context.GameAssets[path] = customAssetInfo;
+            context.Manifest.schemaVersion = Math.Max(context.Manifest.schemaVersion, 4);
+            return customAssetInfo;
+        }
+
         private static bool TryGetGameAssetInfo(UnityEngine.Object refObj, ManifestBuildContext context, out GameAssetInfo gameAssetInfo)
         {
-            gameAssetInfo = null;
+            return TryGetAssetInfo(refObj, context, GetOrCreateGameAssetInfo, "game", out gameAssetInfo);
+        }
+
+        private static bool TryGetCustomAssetInfo(UnityEngine.Object refObj, ManifestBuildContext context, out GameAssetInfo customAssetInfo)
+        {
+            return TryGetAssetInfo(refObj, context, GetOrCreateCustomAssetInfo, "custom", out customAssetInfo);
+        }
+
+        private static bool TryGetAssetInfo(UnityEngine.Object refObj, ManifestBuildContext context, Func<string, ManifestBuildContext, GameAssetInfo> getAssetInfo, string kind, out GameAssetInfo assetInfo)
+        {
+            assetInfo = null;
             var path = AssetDatabase.GetAssetPath(refObj);
             if (string.IsNullOrEmpty(path))
             {
@@ -169,25 +222,25 @@ namespace Blueprinter
                     return false;
             }
 
-            gameAssetInfo = GetOrCreateGameAssetInfo(path, context);
-            if (gameAssetInfo == null)
+            assetInfo = getAssetInfo(path, context);
+            if (assetInfo == null)
                 return false;
 
             if (!AssetDatabase.TryGetGUIDAndLocalFileIdentifier(refObj, out _, out long referencedFileId))
             {
-                Debug.LogError($"[Blueprinter] Missing game asset reference identity '{path}'");
+                Debug.LogError($"[Blueprinter] Missing {kind} asset reference identity '{path}'");
                 context.HasErrors = true;
                 return false;
             }
 
-            if (referencedFileId == gameAssetInfo.LocalFileId)
+            if (referencedFileId == assetInfo.LocalFileId)
                 return true;
 
             var mainAsset = AssetDatabase.LoadMainAssetAtPath(path);
             if (refObj is UnityEngine.Audio.AudioMixerGroup && mainAsset is UnityEngine.Audio.AudioMixer)
                 return true;
 
-            Debug.LogError($"[Blueprinter] Unsupported game subasset '{refObj.name}' in '{path}'");
+            Debug.LogError($"[Blueprinter] Unsupported {kind} subasset '{refObj.name}' in '{path}'");
             context.HasErrors = true;
             return false;
         }
@@ -316,7 +369,11 @@ namespace Blueprinter
             if (gameAssetInfo.Patch != null)
                 return gameAssetInfo.Patch;
 
-            var patch = new AssetPatch { GameAsset = gameAssetInfo.Location };
+            var patch = new AssetPatch
+            {
+                GameAsset = gameAssetInfo.Location,
+                SourceBundle = gameAssetInfo.SourceBundle
+            };
 
             gameAssetInfo.Patch = patch;
             context.Manifest.Patches.Add(patch);
@@ -324,7 +381,7 @@ namespace Blueprinter
             return patch;
         }
 
-        private static bool BuildAssetBundles(string cacheFolder, string targetBundleName, string[] targetAssetPaths, string[] gameAssetPaths)
+        private static bool BuildAssetBundles(string cacheFolder, string targetBundleName, string[] targetAssetPaths, string[] gameAssetPaths, string[] customAssetPaths)
         {
             var builds = new List<AssetBundleBuild>
             {
@@ -341,6 +398,15 @@ namespace Blueprinter
                 {
                     assetBundleName = GameAssetBundleName,
                     assetNames = gameAssetPaths
+                });
+            }
+
+            if (customAssetPaths.Length > 0)
+            {
+                builds.Add(new AssetBundleBuild
+                {
+                    assetBundleName = CustomAssetBundleName,
+                    assetNames = customAssetPaths
                 });
             }
 
@@ -438,7 +504,7 @@ namespace Blueprinter
                     return null;
                 }
 
-                if (string.IsNullOrEmpty(dependency) || BlueprinterAssets.IsCodeOrAssemblyFile(dependency) || BlueprinterAssets.IsModInfoFile(dependency) || BlueprinterAssets.IsGameAssetPath(dependency))
+                if (string.IsNullOrEmpty(dependency) || BlueprinterAssets.IsCodeOrAssemblyFile(dependency) || BlueprinterAssets.IsModInfoFile(dependency) || BlueprinterAssets.IsGameAssetPath(dependency) || BlueprinterAssets.IsCustomAssetPath(dependency))
                 {
                     continue;
                 }
@@ -522,16 +588,20 @@ namespace Blueprinter
                     continue;
 
                 var referencedObject = property.objectReferenceValue;
-                if (referencedObject == null || !TryGetGameAssetInfo(referencedObject, context, out var gameAssetInfo))
+                if (referencedObject == null)
+                    continue;
+
+                GameAssetInfo referencedAssetInfo;
+                if (!TryGetGameAssetInfo(referencedObject, context, out referencedAssetInfo) && !TryGetCustomAssetInfo(referencedObject, context, out referencedAssetInfo))
                     continue;
 
                 var memberPath = ToRuntimeObjectReferencePath(property, componentType);
-                if (referencedObject is UnityEngine.Audio.AudioMixerGroup && string.Equals(gameAssetInfo.Location.asset.type, BlueprinterAssets.GetRuntimeTypeName(typeof(UnityEngine.Audio.AudioMixer)), StringComparison.Ordinal))
+                if (referencedObject is UnityEngine.Audio.AudioMixerGroup && string.Equals(referencedAssetInfo.Location.asset.type, BlueprinterAssets.GetRuntimeTypeName(typeof(UnityEngine.Audio.AudioMixer)), StringComparison.Ordinal))
                 {
                     memberPath += "::" + referencedObject.name;
                 }
 
-                var assetPatch = GetOrCreatePatch(context, gameAssetInfo);
+                var assetPatch = GetOrCreatePatch(context, referencedAssetInfo);
                 assetPatch.PatchLocations.Add(new LocationRef
                 {
                     id = locationId,

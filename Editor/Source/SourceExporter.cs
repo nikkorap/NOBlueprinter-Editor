@@ -58,7 +58,7 @@ namespace Blueprinter
             var dependencies = AssetDatabase.GetDependencies(BlueprinterAssets.GetModAssetPaths(modName), true);
             foreach (var dependency in dependencies)
             {
-                if (string.IsNullOrEmpty(dependency) || !BlueprinterAssets.IsPathUnder(dependency, BlueprinterSettings.RootFolder) || AssetDatabase.IsValidFolder(dependency) || BlueprinterAssets.IsCodeOrAssemblyFile(dependency) || BlueprinterAssets.IsModInfoFile(dependency) || BlueprinterAssets.IsGameAssetPath(dependency) || BlueprinterAssets.IsStaleGameAssetPath(dependency))
+                if (string.IsNullOrEmpty(dependency) || !BlueprinterAssets.IsPathUnder(dependency, BlueprinterSettings.RootFolder) || AssetDatabase.IsValidFolder(dependency) || BlueprinterAssets.IsCodeOrAssemblyFile(dependency) || BlueprinterAssets.IsModInfoFile(dependency) || BlueprinterAssets.IsGameAssetPath(dependency) || BlueprinterAssets.IsCustomAssetPath(dependency) || BlueprinterAssets.IsStaleGameAssetPath(dependency))
                     continue;
 
                 result.Add(dependency.Replace('\\', '/'));
@@ -166,6 +166,25 @@ namespace Blueprinter
                     guid = guid,
                     fileId = fileId,
                     path = referencedPath.Substring(BlueprinterSettings.GameAssetRootFolder.Length + 1),
+                    type = BlueprinterAssets.GetRuntimeTypeName(asset.GetType())
+                });
+                return true;
+            }
+
+            if (BlueprinterAssets.IsCustomAssetPath(referencedPath))
+            {
+                var asset = SourceArchive.ResolveAsset(referencedPath, fileId);
+                if (asset == null)
+                {
+                    Debug.LogError($"[Blueprinter] Unresolved _donotshipcustom reference {guid}:{fileId} in '{sourceFile}'");
+                    return false;
+                }
+
+                manifest.references.Add(new SourceReference
+                {
+                    guid = guid,
+                    fileId = fileId,
+                    path = referencedPath.Replace('\\', '/'),
                     type = BlueprinterAssets.GetRuntimeTypeName(asset.GetType())
                 });
                 return true;

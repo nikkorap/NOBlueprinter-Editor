@@ -20,6 +20,7 @@ namespace Blueprinter
     public class AssetPatch
     {
         public LocationRef GameAsset;
+        public string SourceBundle;
         public List<LocationRef> PatchLocations = new List<LocationRef>();
     }
 

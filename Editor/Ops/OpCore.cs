@@ -34,6 +34,12 @@ namespace Blueprinter
                 return null;
             }
 
+            if (BlueprinterAssets.IsCustomAssetPath(path))
+            {
+                Debug.LogError($"[Blueprinter] [{opId}] Custom asset not allowed for '{fieldName}'");
+                return null;
+            }
+
             var assetRef = BlueprinterAssets.CreateAssetRef(asset);
             if (assetRef == null)
                 Debug.LogError($"[Blueprinter] [{opId}] Failed asset reference '{fieldName}'");
@@ -65,6 +71,12 @@ namespace Blueprinter
                 if (BlueprinterAssets.IsGameAssetPath(path))
                 {
                     Debug.LogError($"[Blueprinter] [{opId}] Game asset in mod asset list '{path}'");
+                    return null;
+                }
+
+                if (BlueprinterAssets.IsCustomAssetPath(path))
+                {
+                    Debug.LogError($"[Blueprinter] [{opId}] Custom asset in mod asset list '{path}'");
                     return null;
                 }
 

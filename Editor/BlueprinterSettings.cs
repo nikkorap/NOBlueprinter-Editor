@@ -9,6 +9,8 @@ namespace Blueprinter
         public const string ModRootFolder = RootFolder + "/Mods";
         public const string GameAssetBundleName = "_donotship";
         public const string GameAssetRootFolder = RootFolder + "/" + GameAssetBundleName;
+        public const string CustomAssetBundleName = "_donotshipcustom";
+        public const string CustomAssetRootFolder = RootFolder + "/" + CustomAssetBundleName;
         public const string StaleGameAssetRootFolder = GameAssetRootFolder + "/_stale";
         public const string GeneratedFolder = RootFolder + "/Generated";
         public const string ModInfoFileName = "modinfo.json";

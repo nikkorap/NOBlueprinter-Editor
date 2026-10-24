@@ -96,6 +96,11 @@ namespace Blueprinter
             return Array.FindAll(GetAssetPathsUnderFolder(GameAssetRootFolder), path => !IsStaleGameAssetPath(path));
         }
 
+        public static string[] GetCustomAssetPaths()
+        {
+            return GetAssetPathsUnderFolder(CustomAssetRootFolder);
+        }
+
         public static void ClearAssetBundleLabels(IEnumerable<string> assetPaths)
         {
             AssetDatabase.StartAssetEditing();
@@ -122,6 +127,29 @@ namespace Blueprinter
         public static bool IsGameAssetPath(string assetPath)
         {
             return IsPathUnder(assetPath, GameAssetRootFolder) && !IsStaleGameAssetPath(assetPath);
+        }
+
+        public static bool IsCustomAssetPath(string assetPath)
+        {
+            return IsPathUnder(assetPath, CustomAssetRootFolder);
+        }
+
+        public static bool TryGetCustomAssetTarget(string assetPath, out string bundleName, out string locator)
+        {
+            bundleName = null;
+            locator = null;
+            if (!IsCustomAssetPath(assetPath))
+                return false;
+
+            assetPath = assetPath.Replace('\\', '/');
+            var relativePath = assetPath.Substring(CustomAssetRootFolder.Length).TrimStart('/');
+            var separator = relativePath.IndexOf('/');
+            if (separator <= 0 || separator == relativePath.Length - 1)
+                return false;
+
+            bundleName = relativePath.Substring(0, separator).ToLowerInvariant();
+            locator = ModRootFolder + "/" + relativePath;
+            return true;
         }
 
         public static bool IsStaleGameAssetPath(string assetPath)
