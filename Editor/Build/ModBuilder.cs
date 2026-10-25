@@ -155,26 +155,59 @@ namespace Blueprinter
             return gameAssetInfo;
         }
 
-        private static GameAssetInfo GetOrCreateCustomAssetInfo(string path, ManifestBuildContext context)
+        private static GameAssetInfo GetOrCreateCustomAssetInfo(string path, UnityEngine.Object refObj, ManifestBuildContext context)
         {
             if (!BlueprinterAssets.TryGetCustomAssetTarget(path, out var bundleName, out var locator))
                 return null;
 
-            if (context.GameAssets.TryGetValue(path, out var customAssetInfo))
-                return customAssetInfo;
-
             var mainAsset = AssetDatabase.LoadMainAssetAtPath(path);
-            if (mainAsset == null)
+            if (mainAsset == null || refObj == null)
                 return null;
 
-            if (!AssetDatabase.TryGetGUIDAndLocalFileIdentifier(mainAsset, out _, out long localFileId))
+            if (!AssetDatabase.TryGetGUIDAndLocalFileIdentifier(mainAsset, out _, out long mainFileId) ||
+                !AssetDatabase.TryGetGUIDAndLocalFileIdentifier(refObj, out _, out long referencedFileId))
             {
                 Debug.LogError($"[Blueprinter] Missing custom asset identity '{path}'");
                 context.HasErrors = true;
                 return null;
             }
 
-            var type = BlueprinterAssets.GetRuntimeTypeName(mainAsset.GetType());
+            var targetAsset = mainAsset;
+            var localFileId = mainFileId;
+            var mixerGroup = refObj is UnityEngine.Audio.AudioMixerGroup && mainAsset is UnityEngine.Audio.AudioMixer;
+
+            if (referencedFileId != mainFileId && !mixerGroup)
+            {
+                var referencedType = refObj.GetType();
+                var matches = 0;
+                var matchedReference = false;
+
+                foreach (var asset in AssetDatabase.LoadAllAssetsAtPath(path))
+                {
+                    if (asset == null || asset.GetType() != referencedType)
+                        continue;
+
+                    matches++;
+                    if (asset == refObj)
+                        matchedReference = true;
+                }
+
+                if (matches != 1 || !matchedReference || referencedType.IsAssignableFrom(mainAsset.GetType()))
+                {
+                    Debug.LogError($"[Blueprinter] Unsupported custom subasset '{refObj.name}' in '{path}'");
+                    context.HasErrors = true;
+                    return null;
+                }
+
+                targetAsset = refObj;
+                localFileId = referencedFileId;
+            }
+
+            var type = BlueprinterAssets.GetRuntimeTypeName(targetAsset.GetType());
+            var cacheKey = path + "|" + type;
+            if (context.GameAssets.TryGetValue(cacheKey, out var customAssetInfo))
+                return customAssetInfo;
+
             customAssetInfo = new GameAssetInfo
             {
                 LocalFileId = localFileId,
@@ -185,13 +218,13 @@ namespace Blueprinter
                     asset = new AssetRef
                     {
                         locator = locator,
-                        name = mainAsset.name,
+                        name = targetAsset.name,
                         type = type
                     }
                 }
             };
 
-            context.GameAssets[path] = customAssetInfo;
+            context.GameAssets[cacheKey] = customAssetInfo;
             context.Manifest.schemaVersion = Math.Max(context.Manifest.schemaVersion, 4);
             return customAssetInfo;
         }
@@ -203,7 +236,7 @@ namespace Blueprinter
 
         private static bool TryGetCustomAssetInfo(UnityEngine.Object refObj, ManifestBuildContext context, out GameAssetInfo customAssetInfo)
         {
-            return TryGetAssetInfo(refObj, context, GetOrCreateCustomAssetInfo, "custom", out customAssetInfo);
+            return TryGetAssetInfo(refObj, context, (path, buildContext) => GetOrCreateCustomAssetInfo(path, refObj, buildContext), "custom", out customAssetInfo);
         }
 
         private static bool TryGetAssetInfo(UnityEngine.Object refObj, ManifestBuildContext context, Func<string, ManifestBuildContext, GameAssetInfo> getAssetInfo, string kind, out GameAssetInfo assetInfo)
