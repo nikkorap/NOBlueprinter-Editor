@@ -10,7 +10,7 @@ namespace Blueprinter
         private const string AssetRipperAssetsPrefsKey = "Blueprinter_AssetRipperExportPath";
         private const string DisclaimerText = "Blueprinter is an unofficial modding tool. Nuclear Option does not currently provide official mod support, and compatibility with future game versions is not guaranteed.\n\n" + "Game updates can irrecoverably break Blueprinter projects and may require substantial rework. Source ZIPs are intended to make updating easier, but they cannot guarantee that a project can be recovered. Keep backups of your project.\n\n" + "Do not redistribute base game files\n\n" + "Files under _donotship and Packages/nuclearoption are copied or extracted from Nuclear Option solely for use while authoring with Blueprinter. Do not include them in released mods or share them outside your project.";
 
-        private string _gameVersion = "0.34.2";
+        private string _gameVersion = "0.34.6";
         private bool _disclaimerAccepted;
 
         [MenuItem("Blueprinter/Project Setup", false, 20)]
