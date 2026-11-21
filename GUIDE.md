@@ -77,7 +77,7 @@ Keep each Op inside the mod folder.
 1. Select `Blueprinter` > `Mod Builder`.
 2. Select the mod under `Select Mod`.
 3. Enter the `Display name`.
-4. Enter the `Mod version` in `1.2.3` format.
+4. Enter the `Mod version` in `1.2.3` or `1.2.3.4` format. The 4th number will be ignored by the multiplayer compatibility patch.
 5. Select a `Build output folder` outside `Assets/Blueprinter/Mods` and `Assets/Blueprinter/_donotship`.
 6. Click `Build Mod`.
 Blueprinter creates `<DisplayName>_<Version>.nobp` in the selected output folder.
