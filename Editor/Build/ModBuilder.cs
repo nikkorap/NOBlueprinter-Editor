@@ -12,7 +12,7 @@ namespace Blueprinter
     {
         private const string ManifestAssetPath = GeneratedFolder + "/patch_manifest.json";
 
-        public static bool ValidateVersion(string input, out string value)
+        public static bool ValidateVersion(string input, out string value, bool allowRevision = false)
         {
             value = string.Empty;
             foreach (var character in input)
@@ -21,7 +21,7 @@ namespace Blueprinter
                     value += character;
             }
 
-            return Version.TryParse(value, out var version) && version.Build != -1 && version.Revision == -1 && version.ToString() == value;
+            return Version.TryParse(value, out var version) && version.Build != -1 && (allowRevision || version.Revision == -1) && version.ToString() == value;
         }
 
         private class GameAssetInfo

@@ -97,11 +97,14 @@ namespace Blueprinter
                 modInfoChanged = true;
 
             var previousVersion = _version;
-            var validVersion = ModBuilder.ValidateVersion(EditorGUILayout.TextField("Mod version", _version), out _version);
+            var validVersion = ModBuilder.ValidateVersion(EditorGUILayout.TextField("Mod version", _version), out _version, true);
             if (_version != previousVersion)
                 modInfoChanged = true;
             if (modInfoChanged && validVersion)
                 SaveCurrentModInfo();
+
+            if (validVersion && Version.TryParse(_version, out var version) && version.Revision != -1)
+                EditorGUILayout.HelpBox("The 4th number will be ignored by the multiplayer compatibility patch", MessageType.Info);
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Build output folder");
